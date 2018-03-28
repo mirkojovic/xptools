@@ -108,6 +108,10 @@ enum {
 #if WANT_TERRASEVER	
 	wed_ToggleTerraserver,
 #endif	
+	wed_SlippyMapNone,
+	wed_SlippyMapOSM,
+	wed_SlippyMapESRI,
+	wed_SlippyMapCustom,
 #if WITHNWLINK
 	wed_ToggleLiveView,
 #endif
@@ -162,7 +166,8 @@ enum {
 	wed_UpdateMetadata, //Open up dialogbox
 	// Help Menu
 	wed_HelpManual,
-	wed_HelpScenery
+	wed_HelpScenery,
+	wed_OSMFixTheMap
 };
 
 class	GUI_Application;

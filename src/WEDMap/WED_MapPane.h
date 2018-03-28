@@ -54,6 +54,7 @@ class	IDocPrefs;
 class	WED_Archive;
 class	GUI_Commander;
 class	WED_LibraryListAdapter;
+class	WED_OSMSlippyMap;
 #if WITHNWLINK
 class	WED_NWInfoLayer;
 #endif
@@ -104,6 +105,7 @@ private:
 #if WANT_TERRASEVER
 	WED_TerraserverLayer *	mTerraserver;
 #endif	
+	WED_OSMSlippyMap *		mOSMSlippyMap;
 //	WED_TileServerLayer *	mTileserver;
 	WED_StructureLayer *	mStructureLayer;
 	WED_ATCLayer *			mATCLayer;
