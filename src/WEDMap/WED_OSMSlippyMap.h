@@ -52,8 +52,8 @@ private:
 	map<string,int>				m_cache;
 
 			int		mMapMode;
-			string	url_printf_fmt;
-			string	dir_printf_fmt;
+			string	url_fmt;
+			string	dir_fmt;
 			bool	is_jpg_not_png;
 };
 

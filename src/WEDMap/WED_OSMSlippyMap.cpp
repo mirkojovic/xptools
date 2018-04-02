@@ -148,6 +148,21 @@ static void get_tile_range_for_box(const double bounds[4], int z, int tiles[4])
 	tiles[3] = intlim(lat2tiley(bounds[3], z), 0, max_tile);
 }
 
+static bool replace_token(string& str, const string& from, const string& to)
+{
+	size_t start_pos = str.find(from);
+	if(start_pos == string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
+static string str_from_int(int i)
+{
+	ostringstream stream;
+	stream << i;
+	return stream.str();
+}
 
 WED_OSMSlippyMap::WED_OSMSlippyMap(GUI_Pane * h, WED_MapZoomerNew * zoomer, IResolver * resolver)
 	: WED_MapLayer(h, zoomer, resolver),
@@ -224,9 +239,14 @@ void	WED_OSMSlippyMap::DrawVisualization(bool inCurrent, GUI_GraphState * g)
 				GUI_FontDraw(g, font_UI_Basic, black, (pbounds[0] + pbounds[2]) / 2, (pbounds[1] + pbounds[3]) / 2, msg);
 			}
 #endif
-			char url[200]; snprintf(url,200,url_printf_fmt.c_str(),x,y,z);
-
-			char dir[200]; snprintf(dir,200,dir_printf_fmt.c_str(),x,y,z);                      // make sure ALL args are referenced in the format string
+			string url = url_fmt;
+			replace_token(url, "${x}", str_from_int(x));
+			replace_token(url, "${y}", str_from_int(y));
+			replace_token(url, "${z}", str_from_int(z));
+			string dir = dir_fmt;
+			replace_token(dir, "${x}", str_from_int(x));
+			replace_token(dir, "${y}", str_from_int(y));
+			replace_token(dir, "${z}", str_from_int(z));
 			string folder_prefix(dir); folder_prefix.erase(folder_prefix.find_last_of(DIR_STR));
 
 			//The potential place the tile could appear on disk, were it to be downloaded or have been downloaded
@@ -381,15 +401,6 @@ void	WED_OSMSlippyMap::TimerFired()
 	GetHost()->Refresh();
 }
 
-static bool replace_token(string& str, const string& from, const string& to) 
-{
-    size_t start_pos = str.find(from);
-    if(start_pos == string::npos)
-        return false;
-    str.replace(start_pos, from.length(), to);
-    return true;
-}
-
 void	WED_OSMSlippyMap::SetMode(int mode)
 {
 	if(mode == 0)
@@ -400,21 +411,21 @@ void	WED_OSMSlippyMap::SetMode(int mode)
 	}
 	
 	if(mode <= PREDEFINED_MAPS)
-		url_printf_fmt = tile_url[mode-1];
+		url_fmt = tile_url[mode-1];
 	else
-		url_printf_fmt = gCustomSlippyMap;
+		url_fmt = gCustomSlippyMap;
 		
-	if(replace_token(url_printf_fmt, "${x}", "%1$d") &&
-	   replace_token(url_printf_fmt, "${y}", "%2$d") &&
-	   replace_token(url_printf_fmt, "${z}", "%3$d"))
+	if(url_fmt.find("${x}") != string::npos &&
+	   url_fmt.find("${y}") != string::npos &&
+	   url_fmt.find("${z}") != string::npos)
 	{	
-		dir_printf_fmt = url_printf_fmt.substr(url_printf_fmt.find("//")+2);
-		replace(dir_printf_fmt.begin(), dir_printf_fmt.end(), '/', DIR_CHAR);
+		dir_fmt = url_fmt.substr(url_fmt.find("//")+2);
+		replace(dir_fmt.begin(), dir_fmt.end(), '/', DIR_CHAR);
 		
 		mMapMode = mode;
 		SetVisible(1);
 		
-		string suffix = url_printf_fmt.substr(url_printf_fmt.length()-4);
+		string suffix = url_fmt.substr(url_fmt.length()-4);
 		if (suffix == ".jpg" || suffix == ".JPG")
 			is_jpg_not_png = true;
 		else
